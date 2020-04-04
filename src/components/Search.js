@@ -7,7 +7,6 @@ export default function Search() {
     const [searchedBooks , setSearchedBooks] = useState([]);
 
     const handleQueryChange = (e) => {
-        console.log(e);
         if(e === ''){
             setQuery('')
             setSearchedBooks([])
@@ -30,6 +29,14 @@ export default function Search() {
             .catch(err=>console.log(err));
         }
     }
+
+    const handleUpdate = (data) => {
+        const {book , shelf} = data;
+        BooksApi.update(book,shelf)
+        .then(res=>console.log(res))
+        .catch(err=>console.log(err));
+    }
+
     return (
         <div>
             <div className="search-books">
@@ -53,7 +60,7 @@ export default function Search() {
                                          <div className="book-top">
                                            <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${eachBooks.imageLinks.thumbnail})` }}></div>
                                            <div className="book-shelf-changer">
-                                             <select>
+                                             <select onChange={(e)=>handleUpdate({book: eachBooks, shelf: e.target.value})}>
                                                <option value="move" disabled>Move to...</option>
                                                <option value="currentlyReading">Currently Reading</option>
                                                <option value="wantToRead">Want to Read</option>
