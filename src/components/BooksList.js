@@ -5,7 +5,7 @@ const BooksList = (props) => {
 
     const {books , setBooks , shelf } = props;
 
-    
+
     const handleUpdate = (data) => {
         const {book , shelf} = data;
         const newarr = books.map(eachbook=>{
@@ -16,8 +16,11 @@ const BooksList = (props) => {
         })
         setBooks(newarr);
         BooksApi.update(book,shelf)
-        .then(res=>console.log(res))
-        .catch(err=>console.log(err));
+        .then(res=>alert(`${book.title} has been added to ${shelf} successfully`))
+        .catch(err=>{
+            alert(`An Error Occurred while adding the book to ${shelf}`)
+            console.log(err);
+        });
     }
 
     return(

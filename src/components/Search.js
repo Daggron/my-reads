@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
 import * as BooksApi from '../BooksAPI';
+import ErrorBoundaries from './ErrorBoundaries';
 
 export default function Search() {
     const [query,setQuery] = useState('');
@@ -23,7 +24,6 @@ export default function Search() {
                 else{
                     const books = res.filter(book=>book.imageLinks);
                     setSearchedBooks(books);
-                    console.log(books);
                 }
             })
             .catch(err=>console.log(err));
@@ -33,19 +33,27 @@ export default function Search() {
     const handleUpdate = (data) => {
         const {book , shelf} = data;
         BooksApi.update(book,shelf)
-        .then(res=>console.log(res))
+        .then(res=>alert(`${book.title} has been added to the ${shelf} successfully`))
         .catch(err=>console.log(err));
     }
 
     return (
+        <ErrorBoundaries>
         <div>
+            {
+                query.length !==0 && searchedBooks.length === 0 && (
+                    <div className="notfound">
+                        Can't Find Any book related to <span className="links">{ query }</span>. <p className="links" onClick={()=>setQuery('')}>Clear Search</p>
+                    </div>
+                )
+            }
             <div className="search-books">
             <div className="search-books-bar">
                 <Link to={{pathname:'/'}}>
                     <button className="close-search">Close</button>
                 </Link>
                 <div className="search-books-input-wrapper">
-                <input type="text" onChange={(e)=>handleQueryChange(e.target.value)} placeholder="Search by title or author"/>
+                <input type="text" onChange={(e)=>handleQueryChange(e.target.value)} placeholder="Search by title or author" value={query}/>
 
                 </div>
             </div>
@@ -81,5 +89,6 @@ export default function Search() {
             </div>
             </div>
         </div>
+        </ErrorBoundaries>
     )
 }
