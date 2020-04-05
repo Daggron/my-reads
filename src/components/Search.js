@@ -2,16 +2,21 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
 import * as BooksApi from '../BooksAPI';
 import ErrorBoundaries from './ErrorBoundaries';
+import Book from './Book';
 
-export default function Search() {
+export default function Search(props) {
     const [query,setQuery] = useState('');
     const [searchedBooks , setSearchedBooks] = useState([]);
+    const [fetched , setFetched ] = useState(false);
 
-    const handleQueryChange = (e) => {
-        if(e === ''){
-            setQuery('')
-            setSearchedBooks([])
-        }else{
+    const {allBooks} = props.location.state;
+
+    const handleQueryChange = async (e) => {
+            if(e===''){
+                setQuery('')
+                setSearchedBooks([]);
+            }
+            setFetched(false);
             if(e==='' && query){
                 return setSearchedBooks([]);
             }
@@ -20,14 +25,24 @@ export default function Search() {
             .then(res=>{
                 if(res.error){
                     setSearchedBooks([]);
+                    setFetched(true);
                 }
                 else{
                     const books = res.filter(book=>book.imageLinks);
+                    for(let e in books){
+                        for (let b in allBooks){
+                            if(allBooks[b].id===books[e].id){
+                                books[e].shelf = allBooks[b].shelf;
+                            }
+                        }
+                    }
                     setSearchedBooks(books);
+                    setFetched(true);
+                    // console.log(books);
                 }
             })
             .catch(err=>console.log(err));
-        }
+            
     }
 
     const handleUpdate = (data) => {
@@ -41,7 +56,7 @@ export default function Search() {
         <ErrorBoundaries>
         <div>
             {
-                query.length !==0 && searchedBooks.length === 0 && (
+                query.length !==0 && fetched && searchedBooks.length === 0 && (
                     <div className="notfound">
                         Can't Find Any book related to <span className="links">{ query }</span>. <p className="links" onClick={()=>setQuery('')}>Clear Search</p>
                     </div>
@@ -64,22 +79,7 @@ export default function Search() {
                             searchedBooks.map(eachBooks=>{
                                 return(
                                     <li key={eachBooks.id}>
-                                         <div className="book">
-                                         <div className="book-top">
-                                           <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${eachBooks.imageLinks.thumbnail})` }}></div>
-                                           <div className="book-shelf-changer">
-                                             <select onChange={(e)=>handleUpdate({book: eachBooks, shelf: e.target.value})}>
-                                               <option value="move" disabled>Move to...</option>
-                                               <option value="currentlyReading">Currently Reading</option>
-                                               <option value="wantToRead">Want to Read</option>
-                                               <option value="read">Read</option>
-                                               <option value="none">None</option>
-                                             </select>
-                                           </div>
-                                         </div>
-                                         <div className="book-title">{eachBooks.title}</div>
-                                         <div className="book-authors">{eachBooks.authors}</div>
-                                       </div>
+                                        <Book eachBooks={eachBooks} handleUpdate={handleUpdate} />
                                     </li>
                                 )
                             })
