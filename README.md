@@ -4,6 +4,8 @@ This is the starter template for the final assessment project for Udacity's Reac
 
 Of course, you are free to start this project from scratch if you wish! Just be sure to use [Create React App](https://github.com/facebookincubator/create-react-app) to bootstrap the project.
 
+## The Live Version of site can be found Here. [(View Live)](https://myreads-eight.now.sh/)
+
 ## TL;DR
 
 To get started developing right away:
